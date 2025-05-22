@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BankAccountServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bank-account-service</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">BankAccountServiceImpl.java</span></div><h1>BankAccountServiceImpl.java</h1><pre class="source lang-java linenums">package org.example;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+// Реализация сервиса для работы с банковскими счетами
+public class BankAccountServiceImpl implements BankAccountService {
+<span class="fc" id="L12">    private static final Logger logger = LoggerFactory.getLogger(BankAccountServiceImpl.class);</span>
+
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
+
+    public BankAccountServiceImpl(AccountRepository accountRepository,
+<span class="fc" id="L18">                                  TransactionRepository transactionRepository) {</span>
+<span class="fc" id="L19">        this.accountRepository = accountRepository;</span>
+<span class="fc" id="L20">        this.transactionRepository = transactionRepository;</span>
+<span class="fc" id="L21">    }</span>
+
+    @Override
+    public void applyInterest(String accountId, double rate) {
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        if (rate &lt;= 0) throw new IllegalArgumentException(&quot;Процентная ставка должна быть положительной&quot;);</span>
+
+<span class="fc" id="L27">        logger.debug(&quot;Applying interest of {}% to account {}&quot;, rate, accountId);</span>
+
+<span class="fc" id="L29">        BankAccount account = accountRepository.findById(accountId);</span>
+<span class="fc" id="L30">        double interest = account.getBalance() * rate / 100;</span>
+<span class="fc" id="L31">        account.setBalance(account.getBalance() + interest);</span>
+
+<span class="fc" id="L33">        Transaction transaction = new Transaction(</span>
+<span class="fc" id="L34">                UUID.randomUUID().toString(),</span>
+                accountId,
+                Transaction.TransactionType.INTEREST,
+                interest
+        );
+<span class="fc" id="L39">        transactionRepository.save(transaction);</span>
+<span class="fc" id="L40">    }</span>
+    @Override
+    public void transfer(String fromAccountId, String toAccountId, double amount)
+            throws InsufficientFundsException {
+<span class="fc" id="L44">        logger.debug(&quot;Initiating transfer of {} from account {} to account {}&quot;,</span>
+<span class="fc" id="L45">                amount, fromAccountId, toAccountId);</span>
+
+
+<span class="fc" id="L48">        Objects.requireNonNull(fromAccountId, &quot;Source account ID cannot be null&quot;);</span>
+<span class="fc" id="L49">        Objects.requireNonNull(toAccountId, &quot;Target account ID cannot be null&quot;);</span>
+
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (fromAccountId.equals(toAccountId)) {</span>
+<span class="fc" id="L52">            throw new IllegalArgumentException(&quot;Cannot transfer to the same account&quot;);</span>
+        }
+
+<span class="fc" id="L55">        BankAccount fromAccount = accountRepository.findById(fromAccountId);</span>
+<span class="fc" id="L56">        BankAccount toAccount = accountRepository.findById(toAccountId);</span>
+
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (fromAccount.getBalance() &lt; amount) {</span>
+<span class="fc" id="L59">            throw new InsufficientFundsException(&quot;Insufficient funds for transfer&quot;);</span>
+        }
+
+<span class="fc" id="L62">        fromAccount.setBalance(fromAccount.getBalance() - amount);</span>
+<span class="fc" id="L63">        toAccount.setBalance(toAccount.getBalance() + amount);</span>
+
+<span class="fc" id="L65">        accountRepository.save(fromAccount);</span>
+<span class="fc" id="L66">        accountRepository.save(toAccount);</span>
+<span class="fc" id="L67">    }</span>
+
+    @Override
+    public BankAccount createAccount(String ownerName, double initialBalance) {
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (initialBalance &lt; 0) {</span>
+<span class="fc" id="L72">            throw new IllegalArgumentException(&quot;Initial balance cannot be negative&quot;);</span>
+        }
+
+<span class="fc" id="L75">        String accountId = UUID.randomUUID().toString();</span>
+<span class="fc" id="L76">        BankAccount account = new BankAccount(accountId, ownerName, initialBalance);</span>
+<span class="fc" id="L77">        accountRepository.save(account);</span>
+<span class="fc" id="L78">        return account;</span>
+    }
+
+    @Override
+    public void deposit(String accountId, double amount) {
+<span class="fc" id="L83">        Objects.requireNonNull(accountId, &quot;Account ID cannot be null&quot;);</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (amount &lt;= 0) {</span>
+<span class="fc" id="L85">            throw new IllegalArgumentException(&quot;Deposit amount must be positive, got: &quot; + amount);</span>
+        }
+
+<span class="fc" id="L88">        BankAccount account = accountRepository.findById(accountId);</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (account == null) {</span>
+<span class="fc" id="L90">            throw new IllegalArgumentException(&quot;Account not found&quot;);</span>
+        }
+
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        if (account.isFrozen()) {</span>
+<span class="fc" id="L94">            throw new IllegalStateException(&quot;Cannot deposit to frozen account&quot;);</span>
+        }
+
+<span class="fc" id="L97">        account.setBalance(account.getBalance() + amount);</span>
+<span class="fc" id="L98">        accountRepository.save(account);</span>
+<span class="fc" id="L99">    }</span>
+
+
+    @Override
+    public void withdraw(String accountId, double amount) throws InsufficientFundsException {
+<span class="fc" id="L104">        Objects.requireNonNull(accountId, &quot;Account ID cannot be null&quot;);</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (amount &lt;= 0) {</span>
+<span class="nc" id="L106">            throw new IllegalArgumentException(&quot;Withdrawal amount must be positive, got: &quot; + amount);</span>
+        }
+
+<span class="fc" id="L109">        BankAccount account = accountRepository.findById(accountId);</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (account == null) {</span>
+<span class="nc" id="L111">            throw new IllegalArgumentException(&quot;Account not found&quot;);</span>
+        }
+
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        if (account.isFrozen()) {</span>
+<span class="fc" id="L115">            throw new IllegalStateException(&quot;Cannot withdraw from frozen account&quot;);</span>
+        }
+
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (account.getBalance() &lt; amount) {</span>
+<span class="fc" id="L119">            throw new InsufficientFundsException(&quot;Insufficient funds for withdrawal&quot;);</span>
+        }
+
+<span class="fc" id="L122">        account.setBalance(account.getBalance() - amount);</span>
+<span class="fc" id="L123">        accountRepository.save(account);</span>
+<span class="fc" id="L124">    }</span>
+
+    @Override
+    public double getBalance(String accountId) {
+<span class="fc" id="L128">        BankAccount account = accountRepository.findById(accountId);</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        if (account == null) {</span>
+<span class="fc" id="L130">            throw new IllegalArgumentException(&quot;Account not found&quot;);</span>
+        }
+<span class="nc" id="L132">        return account.getBalance();</span>
+    }
+    @Override
+    public List&lt;BankAccount&gt; getAllAccounts() {
+<span class="fc" id="L136">        return accountRepository.findAll();</span>
+    }
+
+    @Override
+    public void freezeAccount(String accountId) {
+<span class="fc" id="L141">        BankAccount account = accountRepository.findById(accountId);</span>
+<span class="fc" id="L142">        account.setFrozen(true);</span>
+<span class="fc" id="L143">        accountRepository.save(account);</span>
+<span class="fc" id="L144">    }</span>
+
+    @Override
+    public void unfreezeAccount(String accountId) {
+<span class="fc" id="L148">        BankAccount account = accountRepository.findById(accountId);</span>
+<span class="fc" id="L149">        account.setFrozen(false);</span>
+<span class="fc" id="L150">        accountRepository.save(account);</span>
+<span class="fc" id="L151">    }</span>
+
+    @Override
+    public List&lt;Transaction&gt; getTransactionHistory(String accountId) {
+<span class="fc" id="L155">        return transactionRepository.findByAccountId(accountId);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

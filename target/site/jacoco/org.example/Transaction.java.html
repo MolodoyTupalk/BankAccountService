@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Transaction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bank-account-service</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">Transaction.java</span></div><h1>Transaction.java</h1><pre class="source lang-java linenums">package org.example;
+
+import java.time.LocalDateTime;
+
+public class Transaction {
+    private String id;
+    private String accountId;
+    private TransactionType type;
+    private double amount;
+    private LocalDateTime timestamp;
+
+<span class="fc" id="L12">    public enum TransactionType { DEPOSIT, WITHDRAWAL, TRANSFER, INTEREST }</span>
+
+    // Полный конструктор
+    public Transaction(String id, String accountId, TransactionType type,
+<span class="fc" id="L16">                       double amount, LocalDateTime timestamp) {</span>
+<span class="fc" id="L17">        this.id = id;</span>
+<span class="fc" id="L18">        this.accountId = accountId;</span>
+<span class="fc" id="L19">        this.type = type;</span>
+<span class="fc" id="L20">        this.amount = amount;</span>
+<span class="fc" id="L21">        this.timestamp = timestamp;</span>
+<span class="fc" id="L22">    }</span>
+
+    // Упрощенный конструктор (устанавливает текущее время автоматически)
+    public Transaction(String id, String accountId, TransactionType type, double amount) {
+<span class="fc" id="L26">        this(id, accountId, type, amount, LocalDateTime.now());</span>
+<span class="fc" id="L27">    }</span>
+
+    public String getId() {
+<span class="fc" id="L30">        return id;</span>
+    }
+
+    public void setId(String id) {
+<span class="nc" id="L34">        this.id = id;</span>
+<span class="nc" id="L35">    }</span>
+
+    public String getAccountId() {
+<span class="fc" id="L38">        return accountId;</span>
+    }
+
+    public void setAccountId(String accountId) {
+<span class="nc" id="L42">        this.accountId = accountId;</span>
+<span class="nc" id="L43">    }</span>
+
+    public TransactionType getType() {
+<span class="fc" id="L46">        return type;</span>
+    }
+
+    public void setType(TransactionType type) {
+<span class="nc" id="L50">        this.type = type;</span>
+<span class="nc" id="L51">    }</span>
+
+    public double getAmount() {
+<span class="fc" id="L54">        return amount;</span>
+    }
+
+    public void setAmount(double amount) {
+<span class="nc" id="L58">        this.amount = amount;</span>
+<span class="nc" id="L59">    }</span>
+
+    public LocalDateTime getTimestamp() {
+<span class="fc" id="L62">        return timestamp;</span>
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+<span class="nc" id="L66">        this.timestamp = timestamp;</span>
+<span class="nc" id="L67">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

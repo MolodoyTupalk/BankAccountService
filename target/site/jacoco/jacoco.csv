@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+bank-account-service,org.example,Transaction,20,41,0,0,10,14,5,7,5,7
+bank-account-service,org.example,Transaction.TransactionType,0,27,0,0,0,1,0,1,0,1
+bank-account-service,org.example,InsufficientFundsException,0,4,0,0,0,2,0,1,0,1
+bank-account-service,org.example,BankAccount,11,41,0,2,5,15,3,7,3,6
+bank-account-service,org.example,InMemoryTransactionRepository,0,41,1,3,0,10,1,4,0,3
+bank-account-service,org.example,BankAccountServiceImpl,14,297,3,21,3,70,3,21,0,12
